@@ -1,0 +1,311 @@
+"use client";
+
+import Image from "next/image";
+import { useState, useTransition, type FormEvent } from "react";
+import {
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  User,
+} from "lucide-react";
+import { Link, useRouter } from "@/i18n/navigation";
+import { AuthField } from "@/components/auth/auth-field";
+import { FireflyField } from "@/components/FireflyField";
+import {
+  signInWithEmail,
+  signInWithOAuth,
+  signUpWithEmail,
+} from "@/lib/actions/auth";
+import { landingImages } from "@/lib/landing/images";
+import type { Locale } from "@/types";
+
+type Mode = "signin" | "signup";
+
+type Props = {
+  locale: Locale;
+  initialMode?: Mode;
+};
+
+function SocialBtn({
+  label,
+  onClick,
+  disabled,
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-1/40 px-4 py-3 text-sm text-foreground/80 transition-all hover:border-firefly/40 hover:bg-surface-1 hover:text-firefly disabled:opacity-50"
+    >
+      <span className="font-medium">{label}</span>
+    </button>
+  );
+}
+
+export function AuthPage({ locale, initialMode = "signin" }: Props) {
+  const router = useRouter();
+  const [mode, setMode] = useState<Mode>(initialMode);
+  const [showPass, setShowPass] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [pending, startTransition] = useTransition();
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+
+    startTransition(async () => {
+      const result =
+        mode === "signin"
+          ? await signInWithEmail(email, password)
+          : await signUpWithEmail(email, password, name.trim() || undefined);
+
+      if (!result.success) {
+        setError(result.error);
+        return;
+      }
+
+      router.push("/map");
+      router.refresh();
+    });
+  };
+
+  const handleOAuth = (provider: "google" | "apple") => {
+    setError("");
+
+    startTransition(async () => {
+      const result = await signInWithOAuth(provider, locale);
+
+      if (!result.success) {
+        setError(result.error);
+        return;
+      }
+
+      window.location.href = result.data.url;
+    });
+  };
+
+  return (
+    <div className="relative min-h-screen w-full overflow-hidden bg-background">
+      <div className="pointer-events-none absolute -top-40 left-1/2 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-firefly/10 blur-3xl" />
+      <FireflyField count={32} />
+
+      <Link
+        href="/"
+        className="absolute left-6 top-6 z-30 inline-flex items-center gap-2 text-sm text-foreground/60 transition-colors hover:text-firefly"
+      >
+        <span className="inline-flex h-2 w-2 animate-firefly-pulse rounded-full bg-firefly" />
+        <span className="font-display tracking-wide">Firefly</span>
+      </Link>
+
+      <div className="relative z-10 mx-auto grid min-h-screen max-w-7xl grid-cols-1 gap-0 lg:grid-cols-[1.1fr_1fr]">
+        <aside className="relative hidden items-center justify-center overflow-hidden p-12 lg:flex">
+          <div className="relative">
+            <div className="polaroid" style={{ transform: "rotate(-4deg)" }}>
+              <Image
+                src={landingImages.authJar}
+                alt="A glowing firefly jar against a warm nightclub background"
+                width={360}
+                height={440}
+                priority
+                className="h-[440px] w-[360px] object-cover"
+              />
+              <p className="mt-3 text-center font-hand text-[1.6rem] leading-none text-stone-800">
+                tonight, we collect light
+              </p>
+            </div>
+
+            <div className="tape -top-3 left-10 h-6 w-20 rotate-[-8deg]" />
+            <div className="tape -bottom-2 right-8 h-5 w-16 rotate-[6deg]" />
+
+            <div
+              className="glass absolute -right-16 top-10 rounded-lg p-3 firefly-glow"
+              style={{ transform: "rotate(6deg)" }}
+            >
+              <div className="font-mono text-[10px] tracking-wider-2 text-firefly">
+                ADMIT ONE
+              </div>
+              <div className="mt-0.5 font-display text-sm">The Night</div>
+              <div className="mt-1 text-[10px] text-foreground/50">
+                No cover · all year
+              </div>
+            </div>
+
+            <div
+              className="absolute -left-14 bottom-16 rounded-full border-2 border-firefly/60 px-3 py-2 font-mono text-[10px] tracking-wider-2 text-firefly"
+              style={{ transform: "rotate(-14deg)" }}
+            >
+              ✦ MEMBER ✦
+            </div>
+          </div>
+
+          <div className="absolute bottom-12 left-12 right-12">
+            <div className="deco-line mb-4" />
+            <p className="max-w-md font-hand text-2xl leading-snug text-foreground/80">
+              &ldquo;The best parties aren&apos;t found. They&apos;re{" "}
+              <span className="text-firefly">followed.</span>&rdquo;
+            </p>
+            <p className="mt-2 font-mono text-xs tracking-wider-2 text-foreground/40">
+              — A FIREFLY, PROBABLY
+            </p>
+          </div>
+        </aside>
+
+        <section className="relative flex items-center justify-center px-6 py-24 sm:px-12">
+          <div className="w-full max-w-md">
+            <div className="mb-10">
+              <p className="mb-3 font-mono text-xs tracking-wider-2 text-firefly/80">
+                {mode === "signin" ? "WELCOME BACK" : "NEW HERE"}
+              </p>
+              <h1 className="font-display text-5xl leading-[1.05] text-foreground text-glow sm:text-6xl">
+                {mode === "signin" ? (
+                  <>
+                    Step back <br />
+                    <span className="text-gradient-firefly">into the night</span>
+                  </>
+                ) : (
+                  <>
+                    Open the <br />
+                    <span className="text-gradient-firefly underline-squiggle">
+                      jar
+                    </span>
+                  </>
+                )}
+              </h1>
+              <p className="mt-4 text-pretty text-foreground/60">
+                {mode === "signin"
+                  ? "Your saved fireflies are waiting. Pick up where the night left off."
+                  : "Save events, collect nights, and follow the light wherever it goes."}
+              </p>
+            </div>
+
+            <div className="mb-6 grid grid-cols-2 gap-3">
+              <SocialBtn
+                label="Google"
+                disabled={pending}
+                onClick={() => handleOAuth("google")}
+              />
+              <SocialBtn
+                label="Apple"
+                disabled={pending}
+                onClick={() => handleOAuth("apple")}
+              />
+            </div>
+
+            <div className="relative my-6 flex items-center">
+              <div className="deco-line flex-1" />
+              <span className="px-3 font-mono text-[10px] tracking-wider-2 text-foreground/40">
+                OR WITH EMAIL
+              </span>
+              <div className="deco-line flex-1" />
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {mode === "signup" ? (
+                <AuthField icon={<User className="h-4 w-4" />} label="Your name">
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                    placeholder="What should we call you?"
+                    className="w-full bg-transparent text-foreground outline-none placeholder:text-foreground/30"
+                  />
+                </AuthField>
+              ) : null}
+
+              <AuthField icon={<Mail className="h-4 w-4" />} label="Email">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="you@aftersunset.com"
+                  required
+                  className="w-full bg-transparent text-foreground outline-none placeholder:text-foreground/30"
+                />
+              </AuthField>
+
+              <AuthField icon={<Lock className="h-4 w-4" />} label="Password">
+                <input
+                  type={showPass ? "text" : "password"}
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                  className="w-full bg-transparent text-foreground outline-none placeholder:text-foreground/30"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPass((current) => !current)}
+                  className="text-foreground/40 transition-colors hover:text-firefly"
+                  aria-label={showPass ? "Hide password" : "Show password"}
+                >
+                  {showPass ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </AuthField>
+
+              {mode === "signin" ? (
+                <div className="flex items-center justify-between text-xs">
+                  <label className="flex cursor-pointer items-center gap-2 text-foreground/60">
+                    <input type="checkbox" className="accent-firefly" />
+                    Stay glowing
+                  </label>
+                  <button
+                    type="button"
+                    className="text-firefly/80 transition-colors hover:text-firefly"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+              ) : null}
+
+              {error ? (
+                <p className="text-sm text-destructive">{error}</p>
+              ) : null}
+
+              <button
+                type="submit"
+                disabled={pending}
+                className="group mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-firefly px-6 py-3.5 text-sm font-medium text-primary-foreground transition-all hover:scale-[1.01] hover:firefly-glow disabled:opacity-50"
+              >
+                {mode === "signin" ? "Find my fireflies" : "Light the jar"}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </button>
+            </form>
+
+            <p className="mt-8 text-center text-sm text-foreground/60">
+              {mode === "signin" ? "First night out?" : "Already a regular?"}{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  setMode(mode === "signin" ? "signup" : "signin");
+                  setError("");
+                }}
+                className="font-medium text-firefly underline-offset-4 hover:underline"
+              >
+                {mode === "signin" ? "Create an account" : "Sign in"}
+              </button>
+            </p>
+
+            <p className="mt-10 text-center font-mono text-[10px] tracking-wider-2 text-foreground/30">
+              BY JOINING YOU AGREE TO DANCE RESPONSIBLY ✦
+            </p>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
