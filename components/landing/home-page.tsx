@@ -425,7 +425,7 @@ export function HomePage({ featured }: Props) {
             {featured[0] ? (
               <div className="md:col-span-7 md:row-span-2">
                 <div className="h-full" style={{ transform: "rotate(-0.6deg)" }}>
-                  <EventCard event={featured[0]} />
+                  <EventCard event={featured[0]} featured />
                 </div>
               </div>
             ) : null}
@@ -516,11 +516,13 @@ export function HomePage({ featured }: Props) {
             {steps.map((step, i) => (
               <div
                 key={step.n}
-                className={`grid items-center gap-6 md:grid-cols-12 ${
-                  step.align === "right" ? "md:[&>*:first-child]:order-2" : ""
-                }`}
+                className="grid items-center gap-6 md:grid-cols-12"
               >
-                <div className="md:col-span-5">
+                <div
+                  className={`md:col-span-5 md:row-start-1 ${
+                    step.align === "right" ? "md:col-start-8" : ""
+                  }`}
+                >
                   <div
                     className="relative overflow-hidden rounded-2xl border border-firefly/15"
                     style={{
@@ -537,7 +539,11 @@ export function HomePage({ featured }: Props) {
                     />
                   </div>
                 </div>
-                <div className="md:col-span-6 md:col-start-7">
+                <div
+                  className={`md:col-span-6 md:row-start-1 ${
+                    step.align === "left" ? "md:col-start-7" : "md:col-start-1"
+                  }`}
+                >
                   <div className="flex items-baseline gap-4">
                     <span className="font-display text-6xl text-firefly/30">
                       {step.n}

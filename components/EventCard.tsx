@@ -5,6 +5,7 @@ import type { EventListItem } from "@/types/events";
 
 type Props = {
   event: EventListItem;
+  featured?: boolean;
 };
 
 function formatWhen(iso: string) {
@@ -21,15 +22,21 @@ function formatGenre(genre: EventListItem["genre"]) {
   return genre.replace(/_/g, " ");
 }
 
-export function EventCard({ event }: Props) {
+export function EventCard({ event, featured = false }: Props) {
   const image = event.coverImageUrl ?? landingImages.editorialCrowd;
 
   return (
     <Link
       href={`/events/${event.slug}`}
-      className="group block h-full overflow-hidden rounded-3xl border border-firefly/10 bg-card transition-all hover:border-firefly/30 hover:firefly-glow"
+      className={`group block overflow-hidden rounded-3xl border border-firefly/10 bg-card transition-all hover:border-firefly/30 hover:firefly-glow${
+        featured ? " flex h-full flex-col" : " h-full"
+      }`}
     >
-      <div className="relative aspect-[16/10] overflow-hidden">
+      <div
+        className={`relative overflow-hidden${
+          featured ? " min-h-[240px] flex-1" : " aspect-[16/10]"
+        }`}
+      >
         <Image
           src={image}
           alt={event.title}
@@ -45,7 +52,7 @@ export function EventCard({ event }: Props) {
         )}
       </div>
 
-      <div className="space-y-2 p-5">
+      <div className="shrink-0 space-y-2 p-5">
         <div className="font-mono text-[10px] uppercase tracking-wider-2 text-firefly">
           {formatWhen(event.startsAt)}
         </div>

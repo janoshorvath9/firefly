@@ -4,13 +4,14 @@ Nightlife discovery platform for Bucharest — backend-first Next.js + Supabase 
 
 ## Setup
 
-1. `npm run dev` — works immediately with **mock data** (Supabase disabled)
-2. When your database is ready:
-   - Set `SUPABASE_ENABLED = true` in [`lib/supabase/config.ts`](lib/supabase/config.ts)
-   - Uncomment Supabase env vars in `.env.local` (see `.env.example`)
-   - Uncomment auth block in [`middleware.ts`](middleware.ts)
-   - Run migrations: `supabase db push`
-   - Run seed: `supabase db seed` (optional)
+1. `npm run dev` — works with **mock data** until Supabase env vars are set in `.env.local`
+2. Connect Supabase:
+   - Create a project at [supabase.com/dashboard](https://supabase.com/dashboard)
+   - Copy API keys into `.env.local` (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`)
+   - `supabase login` then `supabase link --project-ref <your-project-ref>`
+   - Run migrations: `npm run db:push`
+   - Run seed (optional): `npm run db:seed`
+   - Regenerate types (optional): `npm run db:types`
 
 ## Architecture
 

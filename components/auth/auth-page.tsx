@@ -15,7 +15,7 @@ import { AuthField } from "@/components/auth/auth-field";
 import { FireflyField } from "@/components/FireflyField";
 import {
   signInWithEmail,
-  signInWithOAuth,
+  // signInWithOAuth,
   signUpWithEmail,
 } from "@/lib/actions/auth";
 import { landingImages } from "@/lib/landing/images";
@@ -28,26 +28,26 @@ type Props = {
   initialMode?: Mode;
 };
 
-function SocialBtn({
-  label,
-  onClick,
-  disabled,
-}: {
-  label: string;
-  onClick: () => void;
-  disabled?: boolean;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className="flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-1/40 px-4 py-3 text-sm text-foreground/80 transition-all hover:border-firefly/40 hover:bg-surface-1 hover:text-firefly disabled:opacity-50"
-    >
-      <span className="font-medium">{label}</span>
-    </button>
-  );
-}
+// function SocialBtn({
+//   label,
+//   onClick,
+//   disabled,
+// }: {
+//   label: string;
+//   onClick: () => void;
+//   disabled?: boolean;
+// }) {
+//   return (
+//     <button
+//       type="button"
+//       onClick={onClick}
+//       disabled={disabled}
+//       className="flex items-center justify-center gap-2 rounded-xl border border-border bg-surface-1/40 px-4 py-3 text-sm text-foreground/80 transition-all hover:border-firefly/40 hover:bg-surface-1 hover:text-firefly disabled:opacity-50"
+//     >
+//       <span className="font-medium">{label}</span>
+//     </button>
+//   );
+// }
 
 export function AuthPage({ locale, initialMode = "signin" }: Props) {
   const router = useRouter();
@@ -79,20 +79,20 @@ export function AuthPage({ locale, initialMode = "signin" }: Props) {
     });
   };
 
-  const handleOAuth = (provider: "google" | "apple") => {
-    setError("");
-
-    startTransition(async () => {
-      const result = await signInWithOAuth(provider, locale);
-
-      if (!result.success) {
-        setError(result.error);
-        return;
-      }
-
-      window.location.href = result.data.url;
-    });
-  };
+  // const handleOAuth = (provider: "google" | "apple") => {
+  //   setError("");
+  //
+  //   startTransition(async () => {
+  //     const result = await signInWithOAuth(provider, locale);
+  //
+  //     if (!result.success) {
+  //       setError(result.error);
+  //       return;
+  //     }
+  //
+  //     window.location.href = result.data.url;
+  //   });
+  // };
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-background">
@@ -188,7 +188,7 @@ export function AuthPage({ locale, initialMode = "signin" }: Props) {
               </p>
             </div>
 
-            <div className="mb-6 grid grid-cols-2 gap-3">
+            {/* <div className="mb-6 grid grid-cols-2 gap-3">
               <SocialBtn
                 label="Google"
                 disabled={pending}
@@ -207,7 +207,7 @@ export function AuthPage({ locale, initialMode = "signin" }: Props) {
                 OR WITH EMAIL
               </span>
               <div className="deco-line flex-1" />
-            </div>
+            </div> */}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === "signup" ? (

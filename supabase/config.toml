@@ -1,5 +1,4 @@
-[project]
-id = "firefly"
+project_id = "firefly"
 
 [api]
 enabled = true
@@ -7,10 +6,27 @@ enabled = true
 [db]
 major_version = 15
 
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
 [auth]
 enabled = true
 site_url = "http://localhost:3000"
 additional_redirect_urls = ["http://localhost:3000/auth/callback"]
+
+[auth.email]
+# Disable confirmation emails during local/dev testing to avoid Supabase's
+# built-in SMTP cap (~2 emails/hour). Re-enable for production with custom SMTP.
+enable_confirmations = false
+
+[auth.email.smtp]
+host = "smtp.resend.com"
+port = 465
+user = "resend"
+pass = "env(RESEND_API_KEY)"
+admin_email = "env(RESEND_SMTP_ADMIN_EMAIL)"
+sender_name = "Firefly"
 
 [storage]
 enabled = true

@@ -8,7 +8,9 @@ import {
   Syne,
 } from "next/font/google";
 import { notFound } from "next/navigation";
+import { SessionProvider } from "@/components/session-provider";
 import { routing } from "@/i18n/routing";
+import { getSession } from "@/lib/auth/session";
 import "../globals.css";
 
 const limelight = Limelight({
@@ -59,7 +61,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   }
 
   setRequestLocale(locale);
-  const messages = await getMessages();
+  const [messages, session] = await Promise.all([getMessages(), getSession()]);
 
   return (
     <html
@@ -68,7 +70,7 @@ export default async function LocaleLayout({ children, params }: Props) {
     >
       <body>
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <SessionProvider initialSession={session}>{children}</SessionProvider>
         </NextIntlClientProvider>
       </body>
     </html>

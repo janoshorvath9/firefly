@@ -5,15 +5,12 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const locale = searchParams.get("locale") ?? "en";
 
-  // Supabase OAuth callback — uncomment when SUPABASE_ENABLED = true
-  // const code = searchParams.get("code");
-  // if (code && isSupabaseConfigured()) {
-  //   const { createClient } = await import("@/lib/supabase/server");
-  //   const supabase = await createClient();
-  //   await supabase.auth.exchangeCodeForSession(code);
-  // }
-
-  void isSupabaseConfigured();
+  const code = searchParams.get("code");
+  if (code && isSupabaseConfigured()) {
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
+    await supabase.auth.exchangeCodeForSession(code);
+  }
 
   return NextResponse.redirect(`${origin}/${locale}/map`);
 }

@@ -5,7 +5,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import type { Database } from "@/types/database.types";
-import { isSupabaseConfigured, SUPABASE_DISABLED_MESSAGE } from "./config";
+import {
+  getSupabasePublishableKey,
+  isSupabaseConfigured,
+  SUPABASE_DISABLED_MESSAGE,
+} from "./config";
 
 export async function createClient() {
   if (!isSupabaseConfigured()) {
@@ -16,7 +20,7 @@ export async function createClient() {
 
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    getSupabasePublishableKey()!,
     {
       cookies: {
         getAll() {
